@@ -1,26 +1,36 @@
 package fr.mosef.scala.template.writer
 
 import org.apache.spark.sql.DataFrame
+
 class Writer {
 
-  def write(df: DataFrame, mode: String = "overwrite", path: String): Unit = {
-    df
-      .write
-      .option("header", "true")
+  // Écriture générique : CSV par défaut, mais modifiable via format + mode
+  def write(df: DataFrame, path: String, format: String = "csv", mode: String = "overwrite"): Unit = {
+    df.write
       .mode(mode)
-      .csv(path)
+      .option("header", "true")
+      .format(format)
+      .save(path)
   }
 
-    def writeCSV(df: DataFrame, outputPath: String): Unit = {
-      df.coalesce(1).write.mode("overwrite").option("header", "true").csv(outputPath)
-    }
+  // Écriture CSV (spécifique, avec coalesce pour 1 seul fichier)
+  def writeCSV(df: DataFrame, outputPath: String): Unit = {
+    df.coalesce(1)
+      .write
+      .option("header", "true")
+      .mode("overwrite")
+      .csv(outputPath)
+  }
 
-    def writeParquet(df: DataFrame, outputPath: String): Unit = {
-      df.write.mode("overwrite").parquet(outputPath)
-    }
+  // Écriture Parquet
+  def writeParquet(df: DataFrame, outputPath: String): Unit = {
+    df.write
+      .mode("overwrite")
+      .parquet(outputPath)
+  }
 
-    def showPreview(df: DataFrame, numRows: Int = 10): Unit = {
-      df.show(numRows, truncate = false)
-    }
-
+  // Aperçu du DataFrame en console
+  def showPreview(df: DataFrame, numRows: Int = 10): Unit = {
+    df.show(numRows, truncate = false)
+  }
 }
