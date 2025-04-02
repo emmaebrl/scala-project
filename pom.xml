@@ -110,7 +110,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/emmaebrl/scala-projet</url>
+            <url>https://maven.pkg.github.com/emmaebrl/scala-project</url>
         </repository>
     </distributionManagement>
 </project>
