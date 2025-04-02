@@ -1,6 +1,6 @@
 package fr.mosef.scala.template
 import org.apache.spark.sql.SparkSession
-
+##
 object Main extends App {
   val sparkSession = SparkSession
     .builder
