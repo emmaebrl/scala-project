@@ -10,5 +10,4 @@ class Writer {
       .mode(mode)
       .csv(path)
   }
-
 }
