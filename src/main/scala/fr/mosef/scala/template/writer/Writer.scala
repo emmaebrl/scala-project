@@ -1,35 +1,43 @@
 package fr.mosef.scala.template.writer
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
-class Writer {
+class Writer(sparkSession: SparkSession) {
 
-  // Écriture générique : CSV par défaut, mais modifiable via format + mode
-  def write(df: DataFrame, path: String, format: String = "csv", mode: String = "overwrite"): Unit = {
+  // Écriture générique avec format et options custom
+  def write(df: DataFrame, path: String, format: String = "csv", mode: String = "overwrite", options: Map[String, String] = Map.empty): Unit = {
     df.write
+      .options(options)
       .mode(mode)
-      .option("header", "true")
       .format(format)
       .save(path)
   }
 
-  // Écriture CSV (spécifique, avec coalesce pour 1 seul fichier)
-  def writeCSV(df: DataFrame, outputPath: String): Unit = {
+  // Écriture CSV (coalesce pour un seul fichier, séparateur customisable)
+  def writeCSV(df: DataFrame, outputPath: String, delimiter: String = ",", header: Boolean = true): Unit = {
     df.coalesce(1)
       .write
-      .option("header", "true")
-      .mode("overwrite")
+      .option("header", header.toString)
+      .option("sep", delimiter)
+      .mode(SaveMode.Overwrite)
       .csv(outputPath)
   }
 
   // Écriture Parquet
   def writeParquet(df: DataFrame, outputPath: String): Unit = {
     df.write
-      .mode("overwrite")
+      .mode(SaveMode.Overwrite)
       .parquet(outputPath)
   }
 
-  // Aperçu du DataFrame en console
+  // Écriture table Hive
+  def writeHiveTable(df: DataFrame, tableName: String, mode: SaveMode = SaveMode.Overwrite): Unit = {
+    df.write
+      .mode(mode)
+      .saveAsTable(tableName)
+  }
+
+  // Aperçu du DataFrame
   def showPreview(df: DataFrame, numRows: Int = 10): Unit = {
     df.show(numRows, truncate = false)
   }
