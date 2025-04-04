@@ -5,10 +5,14 @@ import org.apache.spark.sql.{DataFrame, functions => F}
 
 class ProcessorImpl() extends Processor {
 
-  def process(inputDF: DataFrame): DataFrame = {
-    // Exemple : choisir le rapport à appliquer
-    // Ici on applique juste le 1er rapport par défaut
-    generateReport1(inputDF)
+  def process(inputDF: DataFrame, reportType: String): DataFrame = {
+    reportType match {
+      case "report1" => generateReport1(inputDF)
+      case "report2" => generateReport2(inputDF)
+      case "report3" => generateReport3(inputDF)
+      case _ =>
+        throw new IllegalArgumentException(s"Rapport inconnu: $reportType")
+    }
   }
 
   def generateReport1(inputDF: DataFrame): DataFrame = {

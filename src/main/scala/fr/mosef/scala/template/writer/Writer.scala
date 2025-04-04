@@ -1,43 +1,31 @@
 package fr.mosef.scala.template.writer
 
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import java.util.Properties
 
-class Writer(sparkSession: SparkSession) {
+class Writer(spark: SparkSession, props: Properties) {
 
-  // Écriture générique avec format et options custom
-  def write(df: DataFrame, path: String, format: String = "csv", mode: String = "overwrite", options: Map[String, String] = Map.empty): Unit = {
-    df.write
-      .options(options)
-      .mode(mode)
-      .format(format)
-      .save(path)
-  }
-
-  // Écriture CSV (coalesce pour un seul fichier, séparateur customisable)
-  def writeCSV(df: DataFrame, outputPath: String, delimiter: String = ",", header: Boolean = true): Unit = {
-    df.coalesce(1)
-      .write
-      .option("header", header.toString)
+  def write(df: DataFrame, path: String): Unit = {
+    val format    = props.getProperty("format", "csv")
+    val mode      = props.getProperty("mode", "overwrite")
+    val coalesce  = props.getProperty("coalesce", "false").toBoolean
+    val header    = props.getProperty("header", "true")
+    val delimiter = props.getProperty("separator", ",")
+    val writer = df.write
+      .option("header", header)
       .option("sep", delimiter)
-      .mode(SaveMode.Overwrite)
-      .csv(outputPath)
+      .mode(SaveMode.valueOf(mode.toUpperCase))
+
+    val finalWriter = if (coalesce) writer.coalesce(1) else writer
+
+    format match {
+      case "csv"     => finalWriter.csv(path)
+      case "parquet" => finalWriter.parquet(path)
+      case "json"    => finalWriter.json(path)
+      case _         => throw new IllegalArgumentException(s"Format de sortie inconnu : $format")
+    }
   }
 
-  // Écriture Parquet
-  def writeParquet(df: DataFrame, outputPath: String): Unit = {
-    df.write
-      .mode(SaveMode.Overwrite)
-      .parquet(outputPath)
-  }
-
-  // Écriture table Hive
-  def writeHiveTable(df: DataFrame, tableName: String, mode: SaveMode = SaveMode.Overwrite): Unit = {
-    df.write
-      .mode(mode)
-      .saveAsTable(tableName)
-  }
-
-  // Aperçu du DataFrame
   def showPreview(df: DataFrame, numRows: Int = 10): Unit = {
     df.show(numRows, truncate = false)
   }
