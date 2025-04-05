@@ -17,7 +17,9 @@ class ReaderImpl(sparkSession: SparkSession) extends Reader {
         "sep" -> delimiter,
         "header" -> header.toString,
         "inferSchema" -> schema.isEmpty.toString,
-        "mode" -> "FAILFAST"
+        "mode" -> "FAILFAST",
+        "quote" -> "\"",
+        "multiline" -> "true"
       )
 
       val reader = sparkSession.read.options(options)
@@ -61,29 +63,6 @@ class ReaderImpl(sparkSession: SparkSession) extends Reader {
     }
   }
 
-  def read(format: String, options: Map[String, String], path: String): DataFrame = {
-    validatePath(path)
-    val reader = sparkSession.read.options(options)
-
-    format.toLowerCase match {
-      case "csv"     => reader.format("csv").load(path)
-      case "parquet" => reader.parquet(path)
-      case "hive"    => sparkSession.table(path)
-      case _         => throw new IllegalArgumentException(s"Unsupported format: $format")
-    }
-  }
-
-  def read(path: String): DataFrame = {
-    val format = detectFormat(path)
-    val options = Map("header" -> "true", "inferSchema" -> "true")
-
-    read(format, options, path)
-  }
-
-  def read(): DataFrame = {
-    sparkSession.sql("SELECT 'Empty DataFrame placeholder' as message")
-  }
-
   private def validatePath(path: String): Unit = {
     if (path == null || path.trim.isEmpty) {
       throw new IllegalArgumentException("Path cannot be null or empty")
@@ -102,13 +81,6 @@ class ReaderImpl(sparkSession: SparkSession) extends Reader {
     if (!isValid) {
       logWarning(s"File $path does not have one of the expected extensions: ${validExtensions.mkString(", ")}")
     }
-  }
-
-  private def detectFormat(path: String): String = {
-    val lower = path.toLowerCase
-    if (lower.endsWith(".csv") || lower.endsWith(".txt")) "csv"
-    else if (lower.endsWith(".parquet") || lower.endsWith(".pqt")) "parquet"
-    else "unknown"
   }
 
   private def logError(message: String): Unit = {
