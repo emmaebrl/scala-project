@@ -4,6 +4,14 @@ import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import java.util.Properties
 
 class Writer(spark: SparkSession, props: Properties) {
+  def parseSaveMode(mode: String): SaveMode = mode.toLowerCase match {
+    case "overwrite"     => SaveMode.Overwrite
+    case "append"        => SaveMode.Append
+    case "ignore"        => SaveMode.Ignore
+    case "errorifexists" => SaveMode.ErrorIfExists
+    case other => throw new IllegalArgumentException(s"Mode d'écriture non supporté: $other")
+  }
+
 
   def write(df: DataFrame, path: String): Unit = {
     val format    = props.getProperty("format", "csv")
@@ -17,7 +25,8 @@ class Writer(spark: SparkSession, props: Properties) {
     val writer = finalDF.write
       .option("header", header)
       .option("sep", delimiter)
-      .mode(SaveMode.valueOf(mode.toLowerCase.capitalize))
+      .mode(parseSaveMode(mode))
+
 
     format match {
       case "csv"     => writer.csv(path)

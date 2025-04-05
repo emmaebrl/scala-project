@@ -11,6 +11,7 @@ import com.globalmentor.apache.hadoop.fs.BareLocalFileSystem
 import org.apache.hadoop.fs.FileSystem
 
 import java.util.Properties
+import java.io.FileInputStream
 
 object Main extends App {
 
@@ -36,6 +37,8 @@ object Main extends App {
       println("Aucun type de rapport précisé, 'report1' utilisé par défaut")
       Seq("report1")
   }
+
+  val CONFIG_PATH: Option[String] = if (cliArgs.length > 4) Some(cliArgs(4)) else None
 
   val conf = new SparkConf()
   conf.set("spark.driver.memory", "64M") // ??
@@ -63,14 +66,20 @@ object Main extends App {
     else "unknown"
   }
 
-  // ✅ Chargement de la config de l'écriture depuis application.properties
+  // ✅ Chargement configuration depuis fichier interne ou externe
   val confWriter = new Properties()
-  val stream = getClass.getClassLoader.getResourceAsStream("application.properties")
+  val stream = CONFIG_PATH match {
+    case Some(path) =>
+      println(s"📄 Chargement config externe : $path")
+      new FileInputStream(path)
+    case None =>
+      println("📄 Chargement config interne : application.properties")
+      getClass.getClassLoader.getResourceAsStream("application.properties")
+  }
   if (stream == null) {
-    throw new RuntimeException("Fichier application.properties introuvable dans resources")
+    throw new RuntimeException("❌ Fichier de configuration introuvable")
   }
   confWriter.load(stream)
-
   val reader: Reader = new ReaderImpl(sparkSession)
   val processor: Processor = new ProcessorImpl()
   val writer: Writer = new Writer(sparkSession, confWriter)
