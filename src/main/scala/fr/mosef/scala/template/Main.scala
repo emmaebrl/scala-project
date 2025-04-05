@@ -103,4 +103,7 @@ object Main extends App {
   val outputPath = s"$DST_PATH/$REPORT_TYPE"
   println(s"Écriture du rapport '$REPORT_TYPE' vers $outputPath")
   writer.write(processedDF, outputPath) // Output
+
+  println(s"Affichage des premières lignes du rapport '$REPORT_TYPE' généré :")
+  processedDF.show(5, truncate = false)
 }

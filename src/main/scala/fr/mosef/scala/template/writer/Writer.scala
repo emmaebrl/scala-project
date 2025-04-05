@@ -17,7 +17,7 @@ class Writer(spark: SparkSession, props: Properties) {
     val writer = finalDF.write
       .option("header", header)
       .option("sep", delimiter)
-      .mode(SaveMode.valueOf(mode.toUpperCase))
+      .mode(SaveMode.valueOf(mode.toLowerCase.capitalize))
 
     format match {
       case "csv"     => writer.csv(path)
