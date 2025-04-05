@@ -42,7 +42,6 @@ object Main extends App {
       Seq("report1")
   }
 
-
   val conf = new SparkConf()
   conf.set("spark.driver.memory", "64M") // ??
   conf.set("spark.testing.memory", "471859200") // ??
@@ -108,4 +107,5 @@ object Main extends App {
     println(s"Écriture du rapport '$report' vers $outputPath")
     writer.write(processedDF, outputPath)
   }
+
 }
