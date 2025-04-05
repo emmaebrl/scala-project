@@ -30,11 +30,18 @@ object Main extends App {
     case _: ArrayIndexOutOfBoundsException => "./default/output-writer"
   } // Output
 
-  val REPORT_TYPE: String = try cliArgs(3) catch {
+  //val REPORT_TYPE: String = try cliArgs(3) catch {
+   // case _: ArrayIndexOutOfBoundsException =>
+    //  println("Aucun type de rapport précisé, 'report1' utilisé par défaut")
+    //  "report1"
+  //} // Quel rapport sur les 3 on génère (report1, report2 ou report3)
+
+  val REPORT_TYPES: Seq[String] = try cliArgs(3).split(",").map(_.trim).toSeq catch {
     case _: ArrayIndexOutOfBoundsException =>
       println("Aucun type de rapport précisé, 'report1' utilisé par défaut")
-      "report1"
-  } // Quel rapport sur les 3 on génère (report1, report2 ou report3)
+      Seq("report1")
+  }
+
 
   val conf = new SparkConf()
   conf.set("spark.driver.memory", "64M") // ??
@@ -90,8 +97,15 @@ object Main extends App {
       sys.exit(1)
   } // On appelle la bonne fonction read du Reader selon le type de fichier détécté
 
-  val processedDF: DataFrame = processor.process(inputDF, REPORT_TYPE) // On appelle le process avec le REPORT_TYPE
-  val outputPath = s"$DST_PATH/$REPORT_TYPE"
-  println(s"Écriture du rapport '$REPORT_TYPE' vers $outputPath")
-  writer.write(processedDF, outputPath) // Output
+  //val processedDF: DataFrame = processor.process(inputDF, REPORT_TYPE) // On appelle le process avec le REPORT_TYPE
+  //val outputPath = s"$DST_PATH/$REPORT_TYPE"
+  //println(s"Écriture du rapport '$REPORT_TYPE' vers $outputPath")
+  //writer.write(processedDF, outputPath) // Output
+
+  REPORT_TYPES.foreach { report =>
+    val processedDF = processor.process(inputDF, report)
+    val outputPath = s"$DST_PATH/$report"
+    println(s"Écriture du rapport '$report' vers $outputPath")
+    writer.write(processedDF, outputPath)
+  }
 }
