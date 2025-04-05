@@ -21,7 +21,6 @@ class ProcessorImpl extends Processor {
     inputDF.groupBy("nom_de_la_marque_du_produit")
       .count()
       .orderBy(F.desc("count"))
-      .limit(10)
   }
 
 
