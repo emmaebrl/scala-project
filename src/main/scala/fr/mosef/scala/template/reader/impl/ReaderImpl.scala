@@ -14,7 +14,7 @@ class ReaderImpl(sparkSession: SparkSession) extends Reader {
       .load(path)
   }
 
-  def readCSV(path: String, delimiter: String = ",", header: Boolean = true, schema: Option[StructType] = None): DataFrame = {
+  def readCSV(path: String, delimiter: String = ";", header: Boolean = true, schema: Option[StructType] = None): DataFrame = {
     val reader = sparkSession
       .read
       .option("sep", delimiter)
