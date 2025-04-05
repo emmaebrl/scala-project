@@ -11,17 +11,18 @@ class Writer(spark: SparkSession, props: Properties) {
     val coalesce  = props.getProperty("coalesce", "false").toBoolean
     val header    = props.getProperty("header", "true")
     val delimiter = props.getProperty("separator", ",")
-    val writer = df.write
+
+    val finalDF = if (coalesce) df.coalesce(1) else df
+
+    val writer = finalDF.write
       .option("header", header)
       .option("sep", delimiter)
-      .mode(SaveMode.valueOf(mode.toUpperCase))
-
-    val finalWriter = if (coalesce) writer.coalesce(1) else writer
+      .mode(SaveMode.valueOf(mode.toLowerCase.capitalize))
 
     format match {
-      case "csv"     => finalWriter.csv(path)
-      case "parquet" => finalWriter.parquet(path)
-      case "json"    => finalWriter.json(path)
+      case "csv"     => writer.csv(path)
+      case "parquet" => writer.parquet(path)
+      case "json"    => writer.json(path)
       case _         => throw new IllegalArgumentException(s"Format de sortie inconnu : $format")
     }
   }
