@@ -1,4 +1,4 @@
-# 📦 Scala Spark Template
+# Scala Spark Template
 
 Template modulaire en Scala pour lire, transformer et écrire des données avec Apache Spark.
 
@@ -13,13 +13,19 @@ Template modulaire en Scala pour lire, transformer et écrire des données avec 
 
 ## ▶️ Exécution
 
-### 📄 Syntaxe CLI
+### 📄 Télécharger le fichier JAR depuis GitHub
+
+Télécharge le fichier `scala-project-1.3.2-jar-with-dependencies.jar` depuis :  
+👉 [https://github.com/emmaebrl/scala-project/packages/2457639](https://github.com/emmaebrl/scala-project/packages/2457639)
+
+---
+
+### ▶️ Lancer le projet avec `java -cp`
+
+Une fois le JAR téléchargé, exécute la commande suivante :
 
 ```bash
-spark-submit \
-  --class fr.mosef.scala.template.Main \
-  --master <master-url> \
-  target/scala-2.13/scala-template-assembly-<version>.jar \
+java -cp scala-project-1.3.2-jar-with-dependencies.jar fr.mosef.scala.template.Main \
   <master-url> \
   <input-path> \
   <output-path> \
@@ -94,7 +100,8 @@ src/
 **📄 Exemple application.properties**
 ```text
 properties
-some.setting=example
-output.format=parquet
-compression=gzip
+format=parquet
+header=true
+mode=overwrite
+coalesce=true
 ```
