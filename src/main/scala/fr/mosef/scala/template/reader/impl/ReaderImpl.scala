@@ -3,6 +3,7 @@ package fr.mosef.scala.template.reader.impl
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types.StructType
 import fr.mosef.scala.template.reader.Reader
+import fr.mosef.scala.template.reader.schemas.CsvSchemas  // 👈 import du schéma
 import scala.util.{Try, Success, Failure}
 import java.io.File
 
@@ -32,6 +33,11 @@ class ReaderImpl(sparkSession: SparkSession) extends Reader {
         logError(s"Error reading CSV file $path: ${e.getMessage}")
         throw new RuntimeException(s"Failed to read CSV: ${e.getMessage}", e)
     }
+  }
+
+  // ✅ Nouvelle méthode : lecture CSV avec le schéma de rappel
+  def readRappelCSV(path: String, delimiter: String = ","): DataFrame = {
+    readCSV(path, delimiter, header = true, schema = Some(CsvSchemas.rappelSchema))
   }
 
   def readParquet(path: String): DataFrame = {
