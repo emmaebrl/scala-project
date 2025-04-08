@@ -43,11 +43,15 @@ java -cp scala-project-1.3.2-jar-with-dependencies.jar fr.mosef.scala.template.M
 | `3`      | `REPORT_TYPES` | ❌           | Liste des types de rapports à générer (séparés par des virgules). Par défaut : `report1`. |
 | `4`      | `CONFIG_PATH`  | ❌           | Chemin d'un fichier `.properties` de configuration. Par défaut : `application.properties` en ressources. |
 
+💡Remarque : Les noms report1, report2 et report3 correspondent aux fonctions Scala suivantes :
+- report1 → countOccurrencesByBrand : compte le nombre d’occurrences par marque (marque_de_fabricant).
+- report2 → countSubcategoriesPerCategory : compte le nombre de sous-catégories distinctes pour chaque catégorie de produit.
+- report3 → extractToxicRiskRecalls : filtre les rappels liés à des risques toxiques comme le plomb, les pesticides ou les oxydes.
 
 ✅ Exemples
 **Exemple avec CSV et config externe :**
 ```bash
-spark-submit \
+java-cp \
 --class fr.mosef.scala.template.Main \
 --master local[2] \
 ./scala-template.jar \
@@ -60,7 +64,7 @@ report1,report2 \
 
 **Exemple avec table Hive :**
 ```bash
-spark-submit \
+java-cp \
 --class fr.mosef.scala.template.Main \
 --master yarn \
 ./scala-template.jar \
@@ -72,7 +76,7 @@ report1
 
 **Exemple minimal :**
 ```bash
-spark-submit \
+java-cp \
 --class fr.mosef.scala.template.Main \
 ./scala-template.jar \
 local[2] \
