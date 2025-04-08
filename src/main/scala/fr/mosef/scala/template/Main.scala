@@ -56,7 +56,7 @@ object Main extends App {
     "fs.file.impl",
     classOf[BareLocalFileSystem],
     classOf[FileSystem]
-  ) // ??
+  )
 
   def detectFormatFromPath(path: String): String = { // On déduit automatiquement le format du fichier d'entrée
     val lower = path.toLowerCase
