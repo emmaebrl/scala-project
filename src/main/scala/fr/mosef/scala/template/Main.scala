@@ -41,7 +41,7 @@ object Main extends App {
   val CONFIG_PATH: Option[String] = if (cliArgs.length > 4) Some(cliArgs(4)) else None
 
   val conf = new SparkConf()
-  conf.set("spark.driver.memory", "64M")
+  conf.set("spark.driver.memory", "2g")
   conf.set("spark.testing.memory", "471859200")
 
   val sparkSession = SparkSession
