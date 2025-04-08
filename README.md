@@ -1,4 +1,4 @@
-# Scala Spark Template
+# Projet Scala
 
 Template modulaire en Scala pour lire, transformer et écrire des données avec Apache Spark.
 
