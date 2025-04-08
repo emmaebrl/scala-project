@@ -31,7 +31,6 @@ class Writer(spark: SparkSession, props: Properties) {
     val header    = props.getProperty("header", "true")
     val delimiter = props.getProperty("separator", ",")
 
-    // Nettoyage : suppression des sauts de ligne dans toutes les colonnes
     val cleanedDF = sanitizeDataFrame(df)
     val finalDF   = if (coalesce) cleanedDF.coalesce(1) else cleanedDF
 
@@ -43,7 +42,6 @@ class Writer(spark: SparkSession, props: Properties) {
       .option("multiLine", "true")
       .option("quoteAll", "true")
       .mode(parseSaveMode(mode))
-
 
     format match {
       case "csv"     => writer.csv(path)

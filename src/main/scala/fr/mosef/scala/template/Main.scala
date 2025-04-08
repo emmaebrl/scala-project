@@ -26,7 +26,7 @@ object Main extends App {
 
   val SRC_PATH: String = try cliArgs(1) catch {
     case _: ArrayIndexOutOfBoundsException =>
-      println("❌ Aucun chemin source défini")
+      println("Aucun chemin source défini")
       sys.exit(1)
   }
 
@@ -35,9 +35,7 @@ object Main extends App {
   }
 
   val REPORT_TYPES: Seq[String] = try cliArgs(3).split(",").map(_.trim).toSeq catch {
-    case _: ArrayIndexOutOfBoundsException =>
-      println("ℹ️ Aucun type de rapport précisé, 'report1' utilisé par défaut")
-      Seq("report1")
+    case _: ArrayIndexOutOfBoundsException => Seq("report1")
   }
 
   val CONFIG_PATH: Option[String] = if (cliArgs.length > 4) Some(cliArgs(4)) else None
@@ -73,16 +71,12 @@ object Main extends App {
 
   val confWriter = new Properties()
   val stream = CONFIG_PATH match {
-    case Some(path) if path.trim.nonEmpty =>
-      println(s"📄 Chargement config externe : $path")
-      new FileInputStream(path)
-    case _ =>
-      println("📄 Chargement config interne : application.properties")
-      getClass.getClassLoader.getResourceAsStream("application.properties")
+    case Some(path) if path.trim.nonEmpty => new FileInputStream(path)
+    case _ => getClass.getClassLoader.getResourceAsStream("application.properties")
   }
 
   if (stream == null) {
-    throw new RuntimeException("❌ Fichier de configuration introuvable")
+    throw new RuntimeException("Fichier de configuration introuvable")
   }
 
   confWriter.load(stream)
@@ -92,25 +86,23 @@ object Main extends App {
   val writer: Writer = new Writer(sparkSession, confWriter)
 
   val format = detectFormatFromPath(SRC_PATH)
-  println(s"📂 Format détecté : $format")
 
   val inputDF: DataFrame = format match {
     case "csv" =>
-      reader.readCSV(SRC_PATH, delimiter = ",", header = HAS_HEADER, schema = Some(CsvSchemas.rappelSchema))
+      reader.readAutoHeaderCSV(SRC_PATH, delimiter = ",", schema = Some(CsvSchemas.rappelSchema))
     case "parquet" =>
       reader.readParquet(SRC_PATH)
     case "hive" =>
       val tableName = SRC_PATH.stripPrefix("hive:")
       reader.readHiveTable(tableName)
     case _ =>
-      println(s"❌ Format inconnu pour le chemin : $SRC_PATH")
+      println(s"Format inconnu pour le chemin : $SRC_PATH")
       sys.exit(1)
   }
 
   REPORT_TYPES.foreach { report =>
     val processedDF = processor.process(inputDF, report)
     val outputPath = s"$DST_PATH/$report"
-    println(s"📝 Écriture du rapport '$report' vers $outputPath")
 
     val cleanedDF = processedDF.columns.foldLeft(processedDF) { (df, col) =>
       df.withColumn(col, org.apache.spark.sql.functions.regexp_replace(df(col), "\r\n|\n|\r", " "))

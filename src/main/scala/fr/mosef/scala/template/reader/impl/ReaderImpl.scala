@@ -3,11 +3,43 @@ package fr.mosef.scala.template.reader.impl
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types.StructType
 import fr.mosef.scala.template.reader.Reader
-import fr.mosef.scala.template.reader.schemas.CsvSchemas  // 👈 import du schéma
+import fr.mosef.scala.template.reader.schemas.CsvSchemas
 import scala.util.{Try, Success, Failure}
 import java.io.File
 
 class ReaderImpl(sparkSession: SparkSession) extends Reader {
+
+  def readAutoHeaderCSV(path: String, delimiter: String = ",", schema: Option[StructType] = None): DataFrame = {
+    validatePath(path)
+    validateFileExtension(path, List(".csv", ".txt", ".data"))
+
+    val source = scala.io.Source.fromFile(path)
+    val lines = try source.getLines().take(2).toList finally source.close()
+
+    val likelyHeader = lines.headOption.getOrElse("")
+    val firstDataRow = if (lines.size > 1) lines(1) else ""
+
+    val headerLooksLikeColumnNames = likelyHeader.split(delimiter).forall { col =>
+      !col.matches("^\\d+$")
+    }
+
+    val header = headerLooksLikeColumnNames
+    println(s"Détection automatique : header = $header")
+
+    val options = Map(
+      "sep" -> delimiter,
+      "header" -> header.toString,
+      "inferSchema" -> schema.isEmpty.toString,
+      "mode" -> "FAILFAST",
+      "quote" -> "\"",
+      "multiline" -> "true"
+    )
+
+    val reader = sparkSession.read.options(options)
+    val withSchema = schema.map(reader.schema).getOrElse(reader)
+
+    withSchema.format("csv").load(path)
+  }
 
   def readCSV(path: String, delimiter: String = ",", header: Boolean = true, schema: Option[StructType] = None): DataFrame = {
     validatePath(path)
@@ -35,7 +67,6 @@ class ReaderImpl(sparkSession: SparkSession) extends Reader {
     }
   }
 
-  // ✅ Nouvelle méthode : lecture CSV avec le schéma de rappel
   def readRappelCSV(path: String, delimiter: String = ","): DataFrame = {
     readCSV(path, delimiter, header = true, schema = Some(CsvSchemas.rappelSchema))
   }
