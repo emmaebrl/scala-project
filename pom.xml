@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>emmaebrl</groupId>
     <artifactId>scala-project</artifactId>
-    <version>1.4.4</version>
+    <version>2.0</version>
     <properties>
         <encoding>UTF-8</encoding>
     </properties>

@@ -39,9 +39,6 @@ object Main extends App {
   }
 
   val CONFIG_PATH: Option[String] = if (cliArgs.length > 4) Some(cliArgs(4)) else None
-  val HAS_HEADER: Boolean = try cliArgs(5).toBoolean catch {
-    case _: Throwable => true
-  }
 
   val conf = new SparkConf()
   conf.set("spark.driver.memory", "2g")

@@ -3,7 +3,6 @@ package fr.mosef.scala.template.reader.impl
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types.StructType
 import fr.mosef.scala.template.reader.Reader
-import fr.mosef.scala.template.reader.schemas.CsvSchemas
 import scala.util.{Try, Success, Failure}
 import java.io.File
 
@@ -17,7 +16,6 @@ class ReaderImpl(sparkSession: SparkSession) extends Reader {
     val lines = try source.getLines().take(2).toList finally source.close()
 
     val likelyHeader = lines.headOption.getOrElse("")
-    val firstDataRow = if (lines.size > 1) lines(1) else ""
 
     val headerLooksLikeColumnNames = likelyHeader.split(delimiter).forall { col =>
       !col.matches("^\\d+$")
@@ -67,9 +65,6 @@ class ReaderImpl(sparkSession: SparkSession) extends Reader {
     }
   }
 
-  def readRappelCSV(path: String, delimiter: String = ","): DataFrame = {
-    readCSV(path, delimiter, header = true, schema = Some(CsvSchemas.rappelSchema))
-  }
 
   def readParquet(path: String): DataFrame = {
     validatePath(path)
