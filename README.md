@@ -15,7 +15,7 @@ Template modulaire en Scala pour lire, transformer et écrire des données avec 
 
 ### 📄 Télécharger le fichier JAR depuis GitHub
 
-Télécharge le fichier `scala-project-1.3.2-jar-with-dependencies.jar` depuis :  
+Télécharge le fichier `scala-project-3.0-jar-with-dependencies.jar` depuis :  
 👉 [https://github.com/emmaebrl/scala-project/packages/2457639](https://github.com/emmaebrl/scala-project/packages/2457639)
 
 ---
@@ -25,7 +25,7 @@ Télécharge le fichier `scala-project-1.3.2-jar-with-dependencies.jar` depuis :
 Une fois le JAR téléchargé, exécute la commande suivante :
 
 ```bash
-java -cp scala-project-1.3.2-jar-with-dependencies.jar fr.mosef.scala.template.Main \
+java -cp scala-project-3.0-jar-with-dependencies.jar fr.mosef.scala.template.Main \
   <master-url> \
   <input-path> \
   <output-path> \
@@ -95,6 +95,7 @@ src/
 │   │       │   └── impl/ProcessorImpl.scala
 │   │       ├── reader/
 │   │       │   ├── Reader.scala
+│   │       │   ├── schemas/CsvSchemas.scala
 │   │       │   └── impl/ReaderImpl.scala
 │   │       └── writer/Writer.scala
 │   └── resources/
