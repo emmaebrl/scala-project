@@ -50,8 +50,4 @@ class Writer(spark: SparkSession, props: Properties) {
       case _         => throw new IllegalArgumentException(s"Format de sortie inconnu : $format")
     }
   }
-
-  def showPreview(df: DataFrame, numRows: Int = 10): Unit = {
-    df.show(numRows, truncate = false)
-  }
 }
